@@ -1,0 +1,11 @@
+@EndUserText: {
+  label: 'Service Definition for ZC_000_ATRAV'
+}
+@ObjectModel: {
+  leadingEntity: {
+    name: 'ZC_000_ATRAV'
+  }
+}
+define service ZUI_Z000_ATRAV_O4 provider contracts odata_v4_ui {
+  expose ZC_000_ATRAV as Travel;
+}
