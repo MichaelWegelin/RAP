@@ -1,2 +1,2 @@
-#Einführung in das ABAP-RESTful-Programmiermodell
-"# RAP" 
+# Einführung in das ABAP-RESTful-Programmiermodell
+
