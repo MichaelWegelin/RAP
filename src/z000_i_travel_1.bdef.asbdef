@@ -1,0 +1,60 @@
+managed implementation in class zbp_000_travel_1 unique;
+strict ( 2 );
+
+define behavior for Z000_I_TRAVEL_1 alias Travel
+persistent table z000_travel
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create;
+  update;
+  delete;
+  field ( readonly ) TravelID;
+  association _Booking { create; }
+
+  mapping for z000_travel
+    {
+      AgencyID      = agency_id;
+      BeginDate     = begin_date;
+      BookingFee    = booking_fee;
+      CreatedAt     = created_at;
+      CreatedBy     = created_by;
+      CurrencyCode  = currency_code;
+      CustomerID    = customer_id;
+      Description   = description;
+      EndDate       = end_date;
+      LastChangedAt = last_changed_at;
+      LastChangedBy = last_changed_by;
+      OverallStatus = overall_status;
+      TotalPrice    = total_price;
+      TravelID      = travel_id;
+    }
+}
+
+define behavior for Z000_I_BOOKING_1 alias Booking
+persistent table z000_booking
+lock dependent by _Travel
+authorization dependent by _Travel
+//etag master <field_name>
+{
+  update;
+  delete;
+  field ( readonly ) TravelID, BookingID;
+  association _Travel;
+
+  mapping for z000_booking
+    {
+      AirlineID     = carrier_id;
+      BookingDate   = booking_date;
+      BookingID     = booking_id;
+      BookingStatus = booking_status;
+      ConnectionID  = connection_id;
+      CurrencyCode  = currency_code;
+      CustomerID    = customer_id;
+      FlightDate    = flight_date;
+      FlightPrice   = flight_price;
+      LastChangedAt = last_changed_at;
+      TravelID      = travel_id;
+    }
+}

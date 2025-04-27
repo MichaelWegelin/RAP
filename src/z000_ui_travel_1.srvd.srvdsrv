@@ -1,0 +1,5 @@
+@EndUserText.label: 'Service Definition for Z000_C_TRAVEL_1'
+define service Z000_UI_TRAVEL_1 {
+  expose Z000_C_TRAVEL_1  as Travel;
+  expose Z000_C_BOOKING_1 as Booking;
+}
