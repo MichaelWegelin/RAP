@@ -3,9 +3,7 @@
 Hier finden Sie den Code für die Veranstaltung [_ABAP RESTful Application Programming Model_](https://www.rheinwerk-verlag.de/online-kurse/rap-fullstack-entwicklung-fuer-sap/) des Rheinwerk-Verlags.
 
 ## Voraussetzungen
-Um den Code auf Ihrem ABAP-System zu installieren, benötigen Sie [Eclipse mit ADT](https://developers.sap.com/tutorials/abap-install-adt.html) und das [abapGit Plugin für Eclipse](https://developers.sap.com/tutorials/abap-install-abapgit-plugin.html).
-
-Der Code in diesem Repository basiert auf dem [ABAP Flight Reference Scenario for RAP on ABAP Platform Cloud](https://github.com/SAP-samples/abap-platform-refscen-flight/tree/ABAP-platform-cloud).
+Um den Code auf Ihrem ABAP-System zu installieren, benötigen Sie [Eclipse mit ADT](https://developers.sap.com/tutorials/abap-install-adt.html) und das [abapGit Plugin für Eclipse](https://developers.sap.com/tutorials/abap-install-abapgit-plugin.html). Der Code in diesem Repository basiert auf dem [ABAP Flight Reference Scenario for RAP on ABAP Platform Cloud](https://github.com/SAP-samples/abap-platform-refscen-flight/tree/ABAP-platform-cloud).
 
 ## Download
 Verwenden Sie das abapGit Plugin und führen Sie folgende Schritte aus:
