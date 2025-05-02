@@ -1,3 +1,77 @@
+CLASS lsc_z000_i_travel_1 DEFINITION INHERITING FROM cl_abap_behavior_saver.
+
+  PROTECTED SECTION.
+
+    METHODS save_modified REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_z000_i_travel_1 IMPLEMENTATION.
+
+  METHOD save_modified.
+********************************************************************************
+*
+* Implements additional save
+*
+********************************************************************************
+
+    DATA travel_log        TYPE STANDARD TABLE OF /dmo/log_travel.
+    DATA travel_log_create TYPE STANDARD TABLE OF /dmo/log_travel.
+    DATA travel_log_update TYPE STANDARD TABLE OF /dmo/log_travel.
+
+    " (1) Get instance data of all instances that have been created
+    IF create-travel IS NOT INITIAL.
+      " Creates internal table with instance data
+      travel_log = CORRESPONDING #( create-travel ).
+
+      LOOP AT travel_log ASSIGNING FIELD-SYMBOL(<travel_log>).
+        <travel_log>-changing_operation = 'CREATE'.
+
+        " Generate time stamp
+        GET TIME STAMP FIELD <travel_log>-created_at.
+
+        " Read travel instance data into ls_travel that includes %control structure
+        READ TABLE create-travel WITH TABLE KEY entity COMPONENTS TravelId = <travel_log>-travel_id INTO DATA(travel).
+        IF sy-subrc = 0.
+
+          " If new value of the booking_fee field created
+          IF travel-%control-BookingFee = cl_abap_behv=>flag_changed.
+            " Generate uuid as value of the change_id field
+            TRY.
+                <travel_log>-change_id = cl_system_uuid=>create_uuid_x16_static( ) .
+              CATCH cx_uuid_error.
+                "handle exception
+            ENDTRY.
+            <travel_log>-changed_field_name = 'booking_fee'.
+            <travel_log>-changed_value = travel-BookingFee.
+            APPEND <travel_log> TO travel_log_create.
+          ENDIF.
+
+          " If new value of the overall_status field created
+          IF travel-%control-OverallStatus = cl_abap_behv=>flag_changed.
+            " Generate uuid as value of the change_id field
+            TRY.
+                <travel_log>-change_id = cl_system_uuid=>create_uuid_x16_static( ) .
+              CATCH cx_uuid_error.
+                "handle exception
+            ENDTRY.
+            <travel_log>-changed_field_name = 'overall_status'.
+            <travel_log>-changed_value = travel-OverallStatus.
+            APPEND <travel_log> TO travel_log_create.
+          ENDIF.
+
+          " IF  ls_travel-%control-...
+
+        ENDIF.
+      ENDLOOP.
+
+      " Inserts rows specified in lt_travel_log_c into the DB table /dmo/log_travel
+      INSERT /dmo/log_travel FROM TABLE @travel_log_create.
+    ENDIF.
+  ENDMETHOD.
+
+ENDCLASS.
+
 CLASS lhc_Z000_I_TRAVEL_1 DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
 

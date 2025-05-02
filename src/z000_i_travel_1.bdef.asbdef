@@ -2,16 +2,15 @@ managed implementation in class zbp_000_travel_1 unique;
 strict ( 2 );
 
 define behavior for Z000_I_TRAVEL_1 alias Travel
+implementation in class zbp_000_travel_1 unique
 persistent table z000_travel
+with additional save
+etag master LastChangedAt
 lock master
 early numbering
 authorization master ( instance )
-//etag master <field_name>
+// authorization master ( global )
 {
-  create;
-  update;
-  delete;
-
   // administrative fields: read only
   field ( readonly ) LastChangedAt, LastChangedBy, CreatedAt, CreatedBy;
 
@@ -21,13 +20,37 @@ authorization master ( instance )
   // Semantic Key field, which is readonly for the consumer, value is assigned in early numbering
   field ( readonly ) TravelID;
 
+
+  mapping for z000_travel
+    {
+      AgencyId      = agency_id;
+      BeginDate     = begin_date;
+      BookingFee    = booking_fee;
+      CreatedAt     = created_at;
+      CreatedBy     = created_by;
+      CurrencyCode  = currency_code;
+      CustomerId    = customer_id;
+      Description   = description;
+      EndDate       = end_date;
+      LastChangedAt = last_changed_at;
+      LastChangedBy = last_changed_by;
+      OverallStatus = overall_status;
+      TotalPrice    = total_price;
+      TravelId      = travel_id;
+    }
+
+  // standard operations for travel entity
+  create;
+  update;
+  delete;
+
   // validations
   validation validateCustomer on save { create; field CustomerId; }
   validation validateAgency on save { create; field AgencyId; }
   validation validateDates on save { create; field BeginDate, EndDate; }
   validation validateStatus on save { create; field OverallStatus; }
   validation validateCurrencyCode on save { create; field CurrencyCode; }
-  validation validateBookingFee   on save { create; field BookingFee; }
+  validation validateBookingFee on save { create; field BookingFee; }
 
   // instance action and dynamic action control
   action ( features : instance ) acceptTravel result [1] $self;
@@ -37,54 +60,62 @@ authorization master ( instance )
   internal action ReCalcTotalPrice;
 
   // determination
-   determination calculateTotalPrice on modify { create; field BookingFee, CurrencyCode; }
+  determination calculateTotalPrice on modify { create; field BookingFee, CurrencyCode; }
 
-
+  // create booking by associationS
   association _Booking { create ( features : instance ); }
-
-  mapping for z000_travel
-    {
-      AgencyID      = agency_id;
-      BeginDate     = begin_date;
-      BookingFee    = booking_fee;
-      CreatedAt     = created_at;
-      CreatedBy     = created_by;
-      CurrencyCode  = currency_code;
-      CustomerID    = customer_id;
-      Description   = description;
-      EndDate       = end_date;
-      LastChangedAt = last_changed_at;
-      LastChangedBy = last_changed_by;
-      OverallStatus = overall_status;
-      TotalPrice    = total_price;
-      TravelID      = travel_id;
-    }
 }
 
 define behavior for Z000_I_BOOKING_1 alias Booking
+implementation in class zbp_000_booking_1 unique
 persistent table z000_booking
+etag master LastChangedAt
 lock dependent by _Travel
 early numbering
 authorization dependent by _Travel
-//etag master <field_name>
 {
-  update;
-  delete;
-  field ( readonly ) TravelID, BookingID;
-  association _Travel;
+  // administrative fields: read only
+  field ( readonly ) LastChangedAt;
 
+  // static field control
+  field ( mandatory ) AirlineId, ConnectionId, FlightDate, BookingStatus;
+  field ( readonly ) TravelId, BookingId;
+
+  // mapping entity's field types with table field types
   mapping for z000_booking
     {
-      AirlineID     = carrier_id;
+      AirlineId     = carrier_id;
       BookingDate   = booking_date;
-      BookingID     = booking_id;
+      BookingId     = booking_id;
       BookingStatus = booking_status;
-      ConnectionID  = connection_id;
+      ConnectionId  = connection_id;
       CurrencyCode  = currency_code;
-      CustomerID    = customer_id;
+      CustomerId    = customer_id;
       FlightDate    = flight_date;
       FlightPrice   = flight_price;
       LastChangedAt = last_changed_at;
-      TravelID      = travel_id;
+      TravelId      = travel_id;
     }
+
+  // Fields that are mandatory for create but should be read-only afterwards
+  field ( mandatory : create, readonly : update ) BookingDate, CustomerId;
+  field ( mandatory ) CurrencyCode;
+
+  // standard operations for booking entity
+  update;
+  //  delete;
+
+
+  // validations
+  validation validateStatus on save { create; field BookingStatus; }
+  validation validateCustomer     on save { create; field CustomerId; }
+  validation validateConnection   on save { create; field AirlineId, ConnectionId, FlightDate; }
+  validation validateCurrencyCode on save { create; field CurrencyCode; }
+  validation validateFlightPrice  on save { create; field FlightPrice; }
+
+  // determination for calculation of total flight price
+  determination calculateTotalPrice on modify { create; field FlightPrice, CurrencyCode; }
+
+  association _Travel { }
+
 }

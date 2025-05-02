@@ -20,14 +20,14 @@ annotate entity Z000_C_BOOKING_1 with
   @UI.lineItem: [ {
     position: 10 
   } ]
-  TravelID;
+  TravelId;
   @UI.identification: [ {
     position: 20 
   } ]
   @UI.lineItem: [ {
     position: 20 
   } ]
-  BookingID;
+  BookingId;
   @UI.identification: [ {
     position: 30 
   } ]
@@ -41,7 +41,7 @@ annotate entity Z000_C_BOOKING_1 with
   @UI.lineItem: [ {
     position: 40 
   } ]
-  CustomerID;
+  CustomerId;
   @UI.identification: [ {
     position: 50 
   } ]
@@ -55,21 +55,21 @@ annotate entity Z000_C_BOOKING_1 with
   @UI.lineItem: [ {
     position: 60 
   } ]
-  CarrierID;
+  carrierid;
   @UI.identification: [ {
     position: 70 
   } ]
   @UI.lineItem: [ {
     position: 70 
   } ]
-  CarrierName;
+  carriername;
   @UI.identification: [ {
     position: 80 
   } ]
   @UI.lineItem: [ {
     position: 80 
   } ]
-  ConnectionID;
+  ConnectionId;
   @UI.identification: [ {
     position: 90 
   } ]

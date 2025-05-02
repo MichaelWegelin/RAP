@@ -3,15 +3,13 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZBP_000_TRAVEL_1</CLSNAME>
+    <CLSNAME>Z999_DATA_GENERATOR</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Behavior Implementation for Travel</DESCRIPT>
-    <CATEGORY>06</CATEGORY>
+    <DESCRIPT>Data Generator for Managed Package</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
     <UNICODE>X</UNICODE>
-    <CLSDEFINT>Z000_I_TRAVEL_1</CLSDEFINT>
    </VSEOCLASS>
   </asx:values>
  </asx:abap>

@@ -6,14 +6,14 @@
 define view entity Z000_C_BOOKING_1
   as projection on Z000_I_BOOKING_1
 {
-  key TravelID,
-  key BookingID,
+  key TravelId,
+  key BookingId,
       BookingDate,
       @ObjectModel.text.element: ['CustomerName']
-      CustomerID,
+      CustomerId,
       _Customer.LastName as CustomerName,
       @ObjectModel.text.element: ['AirlineName']
-      AirlineID,
+      AirlineId,
       _Carrier.Name      as AirlineName,
       ConnectionId,
       FlightDate,
@@ -21,6 +21,7 @@ define view entity Z000_C_BOOKING_1
       FlightPrice,
       CurrencyCode,
       BookingStatus,
+      _BookingStatus._Text.Text as BookingStatusText : localized,
       LastChangedAt,
       
       /* Associations */

@@ -2,6 +2,7 @@ projection;
 strict ( 2 );
 
 define behavior for Z000_C_TRAVEL_1 alias Travel
+use etag
 {
   use create;
   use update;
@@ -11,9 +12,10 @@ define behavior for Z000_C_TRAVEL_1 alias Travel
 }
 
 define behavior for Z000_C_BOOKING_1 alias Booking
+use etag
 {
   use update;
-  use delete;
+  //use delete;
 
   use association _Travel;
 }
