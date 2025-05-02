@@ -8,7 +8,7 @@ with additional save
 etag master LastChangedAt
 lock master
 early numbering
-authorization master ( instance )
+authorization master ( instance, global )
 // authorization master ( global )
 {
   // administrative fields: read only

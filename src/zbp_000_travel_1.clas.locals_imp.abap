@@ -77,6 +77,18 @@ CLASS lhc_Z000_I_TRAVEL_1 DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS get_instance_authorizations FOR INSTANCE AUTHORIZATION
       IMPORTING keys REQUEST requested_authorizations FOR Travel RESULT result.
+    METHODS get_global_authorizations FOR GLOBAL AUTHORIZATION
+      IMPORTING REQUEST requested_authorizations FOR travel RESULT result.
+
+    METHODS is_create_granted
+      IMPORTING country_code          TYPE land1 OPTIONAL
+      RETURNING VALUE(create_granted) TYPE abap_bool.
+    METHODS is_update_granted
+      IMPORTING country_code          TYPE land1 OPTIONAL
+      RETURNING VALUE(update_granted) TYPE abap_bool.
+    METHODS is_delete_granted
+      IMPORTING country_code          TYPE land1 OPTIONAL
+      RETURNING VALUE(delete_granted) TYPE abap_bool.
 
     METHODS validateagency FOR VALIDATE ON SAVE
       IMPORTING keys FOR travel~validateagency.
@@ -114,7 +126,109 @@ ENDCLASS.
 CLASS lhc_Z000_I_TRAVEL_1 IMPLEMENTATION.
 
   METHOD get_instance_authorizations.
+    DATA: update_requested TYPE abap_bool,
+          delete_requested TYPE abap_bool,
+          update_granted   TYPE abap_bool,
+          delete_granted   TYPE abap_bool.
+
+    READ ENTITIES OF Z000_I_TRAVEL_1 IN LOCAL MODE
+      ENTITY Travel
+        FIELDS ( AgencyID )
+        WITH CORRESPONDING #( keys )
+        RESULT DATA(travels)
+      FAILED failed.
+
+    CHECK travels IS NOT INITIAL.
+
+    "Select country_code and agency of corresponding persistent travel instance
+    "authorization  only checked against instance that have active persistence
+    SELECT FROM z000_travel AS travel
+      INNER JOIN /dmo/agency    AS agency ON travel~agency_id = agency~agency_id
+      FIELDS travel~travel_id, travel~agency_id, agency~country_code
+      FOR ALL ENTRIES IN @travels
+      WHERE travel_id EQ @travels-TravelId
+      INTO  TABLE @DATA(travel_agency_country).
+
+
+    "edit is treated like update
+    update_requested = COND #( WHEN requested_authorizations-%update              = if_abap_behv=>mk-on
+                                 OR requested_authorizations-%action-acceptTravel = if_abap_behv=>mk-on
+                                 OR requested_authorizations-%action-rejectTravel = if_abap_behv=>mk-on
+                               THEN abap_true ELSE abap_false ).
+
+    delete_requested = COND #( WHEN requested_authorizations-%delete      = if_abap_behv=>mk-on
+                               THEN abap_true ELSE abap_false ).
+
+
+    LOOP AT travels INTO DATA(travel).
+      "get country_code of agency in corresponding instance on persistent table
+      READ TABLE travel_agency_country WITH KEY travel_id = travel-TravelId
+        ASSIGNING FIELD-SYMBOL(<travel_agency_country_code>).
+
+      "Auth check for active instances that have before image on persistent table
+      IF sy-subrc = 0.
+
+        "check auth for update
+        IF update_requested = abap_true.
+          update_granted = is_update_granted( <travel_agency_country_code>-country_code  ).
+          IF update_granted = abap_false.
+            APPEND VALUE #( %tky = travel-%tky
+                            %msg = NEW /dmo/cm_flight_messages(
+                                                     textid    = /dmo/cm_flight_messages=>not_authorized_for_agencyid
+                                                     agency_id = travel-AgencyId
+                                                     severity  = if_abap_behv_message=>severity-error )
+                            %element-AgencyId = if_abap_behv=>mk-on
+                           ) TO reported-travel.
+          ENDIF.
+        ENDIF.
+
+        "check auth for delete
+        IF delete_requested = abap_true.
+          delete_granted = is_delete_granted( <travel_agency_country_code>-country_code ).
+          IF delete_granted = abap_false.
+            APPEND VALUE #( %tky = travel-%tky
+                            %msg = NEW /dmo/cm_flight_messages(
+                                     textid   = /dmo/cm_flight_messages=>not_authorized_for_agencyid
+                                     agency_id = travel-AgencyId
+                                     severity = if_abap_behv_message=>severity-error )
+                            %element-AgencyId = if_abap_behv=>mk-on
+                           ) TO reported-travel.
+          ENDIF.
+        ENDIF.
+
+        " operations on draft instances and on active instances that have no persistent before image (eg Update on newly created instance)
+        " create authorization is checked, for newly created instances
+      ELSE.
+        update_granted = delete_granted = is_create_granted( ).
+        IF update_granted = abap_false.
+          APPEND VALUE #( %tky = travel-%tky
+                          %msg = NEW /dmo/cm_flight_messages(
+                                   textid   = /dmo/cm_flight_messages=>not_authorized
+                                   severity = if_abap_behv_message=>severity-error )
+                          %element-AgencyId = if_abap_behv=>mk-on
+                        ) TO reported-travel.
+        ENDIF.
+      ENDIF.
+
+      APPEND VALUE #( LET upd_auth = COND #( WHEN update_granted = abap_true
+                                             THEN if_abap_behv=>auth-allowed
+                                             ELSE if_abap_behv=>auth-unauthorized )
+                          del_auth = COND #( WHEN delete_granted = abap_true
+                                             THEN if_abap_behv=>auth-allowed
+                                             ELSE if_abap_behv=>auth-unauthorized )
+                      IN
+                       %tky = travel-%tky
+                       %update                = upd_auth
+                       %action-acceptTravel   = upd_auth
+                       %action-rejectTravel   = upd_auth
+
+                       %delete                = del_auth
+                    ) TO result.
+    ENDLOOP.
+
   ENDMETHOD.
+
+
 
   METHOD earlynumbering_create.
     DATA:
@@ -587,6 +701,164 @@ CLASS lhc_Z000_I_TRAVEL_1 IMPLEMENTATION.
 
     result = VALUE #( FOR travel IN travels ( %tky      = travel-%tky
                                               %param    = travel ) ).
+
+  ENDMETHOD.
+
+  METHOD is_create_granted.
+    "For validation
+    IF country_code IS SUPPLIED.
+      AUTHORITY-CHECK OBJECT 'Z000_TRVL'
+        ID 'Z000_CNTRY' FIELD country_code
+        ID 'ACTVT'      FIELD '01'.
+      create_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
+
+      "Simulation for full authorization
+      "(not to be used in productive code)
+      create_granted = abap_true.
+
+      " simulation of auth check for demo,
+      " auth granted for country_code US, else not
+*      CASE country_code.
+*        WHEN 'US'.
+*          create_granted = abap_true.
+*        WHEN OTHERS.
+*          create_granted = abap_false.
+*      ENDCASE.
+
+      "For global auth
+    ELSE.
+      AUTHORITY-CHECK OBJECT 'Z000_TRVL'
+        ID 'Z000_CNTRY' DUMMY
+        ID 'ACTVT'      FIELD '01'.
+      create_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
+
+      "Simulation for full authorization
+      "(not to be used in productive code)
+      create_granted = abap_true.
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD is_delete_granted.
+      "For instance auth
+    IF country_code IS SUPPLIED.
+      AUTHORITY-CHECK OBJECT 'Z000_TRVL'
+        ID 'Z000_CNTRY' FIELD country_code
+        ID 'ACTVT'      FIELD '06'.
+      delete_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
+
+      "Simulation for full authorization
+      "(not to be used in productive code)
+      delete_granted = abap_true.
+
+*      " simulation of auth check for demo,
+*      " auth granted for country_code US, else not
+*      CASE country_code.
+*        WHEN 'US'.
+*          delete_granted = abap_true.
+*        WHEN OTHERS.
+*          delete_granted = abap_false.
+*      ENDCASE.
+
+      "For global auth
+    ELSE.
+      AUTHORITY-CHECK OBJECT 'Z000_TRVL'
+        ID 'Z000_CNTRY' DUMMY
+        ID 'ACTVT'      FIELD '06'.
+      delete_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
+
+      "Simulation for full authorization
+      "(not to be used in productive code)
+      delete_granted = abap_true.
+    ENDIF.
+
+
+  ENDMETHOD.
+
+  METHOD is_update_granted.
+    "For instance auth
+    IF country_code IS SUPPLIED.
+      AUTHORITY-CHECK OBJECT 'Z000_TRVL'
+        ID 'Z000_CNTRY' FIELD country_code
+        ID 'ACTVT'      FIELD '02'.
+      update_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
+
+      "Simulation for full authorization
+      "(not to be used in productive code)
+      update_granted = abap_true.
+
+      " simulation of auth check for demo,
+      " auth granted for country_code US, else not
+*      CASE country_code.
+*        WHEN 'US'.
+*          update_granted = abap_true.
+*        WHEN OTHERS.
+*          update_granted = abap_false.
+*      ENDCASE.
+
+      "For global auth
+    ELSE.
+      AUTHORITY-CHECK OBJECT 'Z000_TRVL'
+        ID 'Z000_CNTRY' DUMMY
+        ID 'ACTVT'      FIELD '02'.
+      update_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
+
+      "Simulation for full authorization
+      "(not to be used in productive code)
+      update_granted = abap_true.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD get_global_authorizations.
+    IF requested_authorizations-%create EQ if_abap_behv=>mk-on.
+      IF is_create_granted( ) = abap_true.
+        result-%create = if_abap_behv=>auth-allowed.
+      ELSE.
+        result-%create = if_abap_behv=>auth-unauthorized.
+        APPEND VALUE #( %msg    = NEW /dmo/cm_flight_messages(
+                                       textid   = /dmo/cm_flight_messages=>not_authorized
+                                       severity = if_abap_behv_message=>severity-error )
+                        %global = if_abap_behv=>mk-on ) TO reported-travel.
+
+      ENDIF.
+    ENDIF.
+
+    "Edit is treated like update
+    IF requested_authorizations-%update                =  if_abap_behv=>mk-on OR
+       requested_authorizations-%action-acceptTravel   =  if_abap_behv=>mk-on OR
+       requested_authorizations-%action-rejectTravel   =  if_abap_behv=>mk-on.
+
+      IF  is_update_granted( ) = abap_true.
+        result-%update                =  if_abap_behv=>auth-allowed.
+        result-%action-acceptTravel   =  if_abap_behv=>auth-allowed.
+        result-%action-rejectTravel   =  if_abap_behv=>auth-allowed.
+
+      ELSE.
+        result-%update                =  if_abap_behv=>auth-unauthorized.
+        result-%action-acceptTravel   =  if_abap_behv=>auth-unauthorized.
+        result-%action-rejectTravel   =  if_abap_behv=>auth-unauthorized.
+
+        APPEND VALUE #( %msg    = NEW /dmo/cm_flight_messages(
+                                       textid   = /dmo/cm_flight_messages=>not_authorized
+                                       severity = if_abap_behv_message=>severity-error )
+                        %global = if_abap_behv=>mk-on )
+          TO reported-travel.
+
+      ENDIF.
+    ENDIF.
+
+
+    IF requested_authorizations-%delete =  if_abap_behv=>mk-on.
+      IF is_delete_granted( ) = abap_true.
+        result-%delete = if_abap_behv=>auth-allowed.
+      ELSE.
+        result-%delete = if_abap_behv=>auth-unauthorized.
+        APPEND VALUE #( %msg    = NEW /dmo/cm_flight_messages(
+                                       textid   = /dmo/cm_flight_messages=>not_authorized
+                                       severity = if_abap_behv_message=>severity-error )
+                        %global = if_abap_behv=>mk-on ) TO reported-travel.
+      ENDIF.
+    ENDIF.
 
   ENDMETHOD.
 
