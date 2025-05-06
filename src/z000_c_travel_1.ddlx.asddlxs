@@ -7,7 +7,7 @@
 
 annotate entity Z000_C_TRAVEL_1 with
 {
-  @UI.facet: [ 
+  @UI.facet: [
     {
         label: 'General Information',
         id: 'GeneralInfo',
@@ -20,7 +20,7 @@ annotate entity Z000_C_TRAVEL_1 with
         position: 20,
         type: #LINEITEM_REFERENCE,
         targetElement: '_Booking'
-    } 
+    }
   ]
 
   @UI.identification: [ {
@@ -32,7 +32,7 @@ annotate entity Z000_C_TRAVEL_1 with
   @UI.selectionField: [ {
     position: 10
   } ]
-  TravelID;
+  TravelId;
 
   @UI.identification: [ {
     position: 20
@@ -43,7 +43,13 @@ annotate entity Z000_C_TRAVEL_1 with
   @UI.selectionField: [ {
     position: 20
   } ]
-  AgencyID;
+  @Consumption.valueHelpDefinition: [{
+    entity : {
+        name: '/DMO/I_Agency_StdVH',
+        element: 'AgencyID'  },
+    useForValidation: true
+  }]
+  AgencyId;
 
   @UI.identification: [ {
     position: 30
@@ -54,7 +60,8 @@ annotate entity Z000_C_TRAVEL_1 with
   @UI.selectionField: [ {
     position: 30
   } ]
-  CustomerID;
+  @Consumption.valueHelpDefinition: [{entity: {name: '/DMO/I_Customer_StdVH', element: 'CustomerID' }, useForValidation: true}]
+  CustomerId;
 
   @UI.identification: [ {
     position: 40
@@ -105,6 +112,15 @@ annotate entity Z000_C_TRAVEL_1 with
   @UI.lineItem: [ {
     position: 90
   } ]
+  @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/I_Overall_Status_VH', element: 'OverallStatus' }}]
   OverallStatus;
+
+  @UI.hidden: true
+  OverallStatusText;
+
+
+  @Consumption.valueHelpDefinition: [{entity: {name: 'I_CurrencyStdVH', element: 'Currency' }, useForValidation: true }]
+  CurrencyCode;
+
 
 }

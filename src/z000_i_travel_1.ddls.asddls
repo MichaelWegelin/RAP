@@ -4,13 +4,14 @@
 
 define root view entity Z000_I_TRAVEL_1
   as select from z000_travel
-  composition [0..*] of Z000_I_BOOKING_1 as _Booking
-  
-  association [0..1] to /DMO/I_Agency    as _Agency   on $projection.AgencyId = _Agency.AgencyID
-  association [0..1] to /DMO/I_Customer  as _Customer on $projection.CustomerId = _Customer.CustomerID
-  association [0..1] to I_Currency       as _Currency on $projection.CurrencyCode = _Currency.Currency
+  composition [0..*] of Z000_I_BOOKING_1         as _Booking
+
+  association [0..1] to /DMO/I_Agency            as _Agency        on $projection.AgencyId = _Agency.AgencyID
+  association [0..1] to /DMO/I_Customer          as _Customer      on $projection.CustomerId = _Customer.CustomerID
+  association [0..1] to I_Currency               as _Currency      on $projection.CurrencyCode = _Currency.Currency
   association [1..1] to /DMO/I_Overall_Status_VH as _OverallStatus on $projection.OverallStatus = _OverallStatus.OverallStatus
-  
+  association to /DMO/I_Agency_StdVH             as _Agency_VH     on $projection.AgencyId = _Agency_VH.AgencyID
+
 {
   key travel_id       as TravelId,
       agency_id       as AgencyId,
@@ -33,11 +34,12 @@ define root view entity Z000_I_TRAVEL_1
       // local ETag field --> OData ETag
       @Semantics.systemDateTime.localInstanceLastChangedAt: true
       last_changed_at as LastChangedAt,
-      
+
       /* Associations */
       _Booking,
       _Agency,
       _Customer,
       _Currency,
-      _OverallStatus
+      _OverallStatus,
+      _Agency_VH
 }
