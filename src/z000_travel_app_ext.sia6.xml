@@ -4,9 +4,9 @@
   <asx:values>
    <SIA6>
     <MAIN_OBJECT>
-     <NAME>Z00_TRAVEL_APP_EXT</NAME>
+     <NAME>Z000_TRAVEL_APP_EXT</NAME>
      <TYPE>SIA6</TYPE>
-     <DESCRIPTION>Travel App</DESCRIPTION>
+     <DESCRIPTION>Fiori Elements Travel App</DESCRIPTION>
      <RESPONSIBLE>CB9980000000</RESPONSIBLE>
      <MASTER_LANGUAGE>EN</MASTER_LANGUAGE>
      <MASTER_SYSTEM>H01</MASTER_SYSTEM>
@@ -15,25 +15,18 @@
      </PACKAGE_REF>
      <ABAP_LANGU_VERSION>5</ABAP_LANGU_VERSION>
     </MAIN_OBJECT>
-    <APP_ID>Z00_TRAVEL_APP_EXT</APP_ID>
+    <APP_ID>Z000_TRAVEL_APP_EXT</APP_ID>
     <APP_TYPE>EXT</APP_TYPE>
     <ABAP_LANGUAGE_VERSION>5</ABAP_LANGUAGE_VERSION>
+    <UI_APP_ID>Z000_RAP_TRAVEL_UI5R</UI_APP_ID>
     <SERVICE>
-     <item>
-      <REL_NAME>Z000_UI_TRAVEL_1_O4</REL_NAME>
-      <REL_TYPE>G4BA</REL_TYPE>
-      <APP_ID>Z00_TRAVEL_APP_EXT</APP_ID>
-      <SRVC_NAME>1F377690B9C2B3AB2E0B718FA7899A</SRVC_NAME>
-      <SRVC_TYPE>HT</SRVC_TYPE>
-      <TEXT>Service Binding for Z000_UI_TRAVEL_1</TEXT>
-      <TYPE_TEXT>OData V4</TYPE_TEXT>
-     </item>
      <item>
       <REL_NAME>Z000_UI_TRAVEL_1_O2                0001</REL_NAME>
       <REL_TYPE>IWSV</REL_TYPE>
-      <APP_ID>Z00_TRAVEL_APP_EXT</APP_ID>
+      <APP_ID>Z000_TRAVEL_APP_EXT</APP_ID>
       <SRVC_NAME>41EE45ED634FC7AE00A1DCDE818EAD</SRVC_NAME>
       <SRVC_TYPE>HT</SRVC_TYPE>
+      <UIAD_SRC>Z000_RAP_TRAVEL_UI5R</UIAD_SRC>
       <TEXT>Service Binding for Z000_UI_TRAVEL_1</TEXT>
       <TYPE_TEXT>OData V2</TYPE_TEXT>
      </item>
@@ -45,7 +38,7 @@
       <TEXT>Authorization Object for Travel Scenario</TEXT>
       <AUTH_ITEM>
        <item>
-        <UUID>zmb8MqvKH9CJ8/FF5Hd5og==</UUID>
+        <UUID>brKzhKuUH+CLuMY5ieviCg==</UUID>
         <AUTH_OBJECT>Z000_TRVL</AUTH_OBJECT>
         <AUTH_OBJECT_INSTANCE>0001</AUTH_OBJECT_INSTANCE>
         <TEXT>Authorization Object for Travel Scenario</TEXT>
@@ -55,11 +48,7 @@
           <FIELD>Z000_CNTRY</FIELD>
           <VALUES>
            <item>
-            <UUID>zmb8MqvKH9CJ8/FF5HeZog==</UUID>
-           </item>
-           <item>
-            <UUID>zmb8MqvKH9CJ8/FF5He5og==</UUID>
-            <LOW_VALUE>*</LOW_VALUE>
+            <UUID>brKzhKuUH+CLuMY5iewCCg==</UUID>
            </item>
           </VALUES>
           <TEXT>C/R</TEXT>
@@ -67,22 +56,22 @@
          </item>
          <item>
           <FIELD>ACTVT</FIELD>
-          <VALUE>Display,Create or generate,Change,Delete</VALUE>
+          <VALUE>Create or generate,Change,Display,Delete</VALUE>
           <VALUES>
            <item>
-            <UUID>zmb8MqvKH9CJ8/FF5HfZog==</UUID>
-            <LOW_VALUE>03</LOW_VALUE>
-           </item>
-           <item>
-            <UUID>zmb8MqvKH9CJ8/FF5Hf5og==</UUID>
+            <UUID>brKzhKuUH+CLuMY5iewiCg==</UUID>
             <LOW_VALUE>01</LOW_VALUE>
            </item>
            <item>
-            <UUID>zmb8MqvKH9CJ8/FF5HgZog==</UUID>
+            <UUID>brKzhKuUH+CLuMY5iexCCg==</UUID>
             <LOW_VALUE>02</LOW_VALUE>
            </item>
            <item>
-            <UUID>zmb8MqvKH9CJ8/FF5Hg5og==</UUID>
+            <UUID>brKzhKuUH+CLuMY5iexiCg==</UUID>
+            <LOW_VALUE>03</LOW_VALUE>
+           </item>
+           <item>
+            <UUID>brKzhKuUH+CLuMY5ieyCCg==</UUID>
             <LOW_VALUE>06</LOW_VALUE>
            </item>
           </VALUES>

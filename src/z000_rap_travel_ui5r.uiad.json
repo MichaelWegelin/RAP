@@ -1,0 +1,33 @@
+{
+  "formatVersion": "1",
+  "header": {
+    "description": "Manage Travels",
+    "originalLanguage": "en",
+    "abapLanguageVersion": "cloudDevelopment"
+  },
+  "generalInformation": {
+    "appType": "ui5",
+    "catalogId": "SAP_TC_UI5_REPO_UIAD"
+  },
+  "ui5AppDetails": {
+    "appId": "z000.rap"
+  },
+  "navigation": {
+    "targetMappingId": "UI5R_40F154E2E578E607132D77139575612160F210B5_TM",
+    "semanticObject": "Travel",
+    "action": "manage000",
+    "desktop": true,
+    "tablet": true,
+    "phone": true
+  },
+  "tiles": [
+    {
+      "id": "UI5R_40F154E2E578E607132D77139575612160F210B5_AL",
+      "tileType": "static",
+      "isDefault": true,
+      "standard": {
+        "title": "Manage Travels"
+      }
+    }
+  ]
+}
