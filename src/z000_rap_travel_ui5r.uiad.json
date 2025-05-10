@@ -26,7 +26,8 @@
       "tileType": "static",
       "isDefault": true,
       "standard": {
-        "title": "Manage Travels"
+        "title": "Manage Travels",
+        "icon": "sap-icon://travel-itinerary"
       }
     }
   ]
