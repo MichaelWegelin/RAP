@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service Definition for Z000_C_OVP'
+define service Z000_UI_OVP {
+  expose Z000_C_OVP;
+}

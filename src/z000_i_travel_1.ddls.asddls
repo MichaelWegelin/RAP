@@ -25,6 +25,12 @@ define root view entity Z000_I_TRAVEL_1
       currency_code   as CurrencyCode,
       description     as Description,
       overall_status  as OverallStatus,
+      case overall_status 
+        when 'A' then 3
+        when 'O' then 2
+        when 'X' then 1
+        else 0
+      end as OverallStatusCriticality,
       @Semantics.user.createdBy: true
       created_by      as CreatedBy,
       @Semantics.systemDateTime.createdAt: true
