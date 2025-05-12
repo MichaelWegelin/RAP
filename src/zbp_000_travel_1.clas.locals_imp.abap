@@ -652,20 +652,19 @@ CLASS lhc_Z000_I_TRAVEL_1 IMPLEMENTATION.
        RESULT DATA(travels)
        FAILED failed.
 
-
     result = VALUE #( FOR travel IN travels
-                       ( %tky                           = travel-%tky
-                         %features-%action-rejecttravel = COND #( WHEN travel-OverallStatus = 'X'
-                                                                  THEN if_abap_behv=>fc-o-disabled ELSE if_abap_behv=>fc-o-enabled  )
-                         %features-%action-accepttravel = COND #( WHEN travel-OverallStatus = 'A'
-                                                                  THEN if_abap_behv=>fc-o-disabled ELSE if_abap_behv=>fc-o-enabled   )
-                         %assoc-_booking                = COND #( WHEN travel-OverallStatus = 'X'
-                                                                  THEN if_abap_behv=>fc-o-disabled ELSE if_abap_behv=>fc-o-enabled   )
-                      ) ).
+       ( %tky                           = travel-%tky
+         %features-%action-rejecttravel = COND #( WHEN travel-OverallStatus = 'X'
+                                                  THEN if_abap_behv=>fc-o-disabled ELSE if_abap_behv=>fc-o-enabled  )
+         %features-%action-accepttravel = COND #( WHEN travel-OverallStatus = 'A'
+                                                  THEN if_abap_behv=>fc-o-disabled ELSE if_abap_behv=>fc-o-enabled   )
+         %assoc-_booking                = COND #( WHEN travel-OverallStatus = 'X'
+                                                  THEN if_abap_behv=>fc-o-disabled ELSE if_abap_behv=>fc-o-enabled   )
+      ) ).
   ENDMETHOD.
 
   METHOD acceptTravel.
-    " Modify in local mode: BO-related updates that are not relevant for authorization checks
+    " ModifyS in local mode: BO-related updates that are not relevant for authorization checks
     MODIFY ENTITIES OF Z000_I_TRAVEL_1 IN LOCAL MODE
            ENTITY travel
               UPDATE FIELDS ( OverallStatus )
